@@ -1,0 +1,15 @@
+version: "3"
+services:
+  web:
+    build: .
+    ports:
+      - "9090:9090"
+    depends_on:
+      - postgresdb
+    stdin_open: true
+    tty: true
+  postgresdb:
+    image: postgres
+    restart: always
+    environment:
+          POSTGRES_PASSWORD: BlueSky8@3
