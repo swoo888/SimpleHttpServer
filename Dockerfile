@@ -1,5 +1,5 @@
 FROM golang:1.9.2
-WORKDIR /go/src/SpaceX
+WORKDIR /go/src/SimpleHttpServer
 COPY . .
 RUN go get ./... && go install .
-CMD ["/go/bin/SpaceX"]
+CMD ["/go/bin/SimpleHttpServer"]

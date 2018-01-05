@@ -1,37 +1,38 @@
 package api
 
 import (
-	"SpaceX/dbconn"
+	"SimpleHttpServer/dbconn"
 )
 
-type SpaceBnB struct {
+type spaceBnB struct {
 	ID          int          `json:"-"`
 	User        string       `json:"user"`
 	Title       string       `json:"title"`
 	Description string       `json:"description"`
 	Expiration  string       `json:"expiration"`
-	Location    LocationType `json:"location"`
+	Location    locationType `json:"location"`
 }
 
-type LocationType struct {
+type locationType struct {
 	X float32 `json:"x"`
 	Y float32 `json:"y"`
 }
 
-func NewDummySpaceBnB() SpaceBnB {
-	return SpaceBnB{
-		ID:          1,
-		User:        "A User",
-		Title:       "A Title",
-		Description: "A Description",
-		Expiration:  "2006-01-02T15:04:05",
-		Location: LocationType{
-			X: 2.1,
-			Y: 3.1,
-		},
-	}
-}
+//func newDummySpaceBnB() spaceBnB {
+//	return spaceBnB{
+//		ID:          1,
+//		User:        "A User",
+//		Title:       "A Title",
+//		Description: "A Description",
+//		Expiration:  "2006-01-02T15:04:05",
+//		Location: locationType{
+//			X: 2.1,
+//			Y: 3.1,
+//		},
+//	}
+//}
 
+// CreateSpaceBnBDb creates the database tables to be used by our application
 func CreateSpaceBnBDb() {
 	stmtDrop := `
 		DROP TABLE if EXISTS booking
@@ -49,16 +50,14 @@ func CreateSpaceBnBDb() {
 			CONSTRAINT booking_pkey PRIMARY KEY (id)
 		)`
 	db := dbconn.NewDbConnection()
-	defer db.Close()
+	defer dbconn.CloseDb(db)
 
 	_, err := db.Exec(stmtDrop)
-	checkErr(err)
+	if err != nil {
+		panic(err)
+	}
 
 	_, err = db.Exec(stmt)
-	checkErr(err)
-}
-
-func checkErr(err error) {
 	if err != nil {
 		panic(err)
 	}

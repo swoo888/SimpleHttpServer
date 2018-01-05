@@ -1,21 +1,23 @@
 package main
 
 import (
-	"fmt"
-	"SpaceX/api"
+	"SimpleHttpServer/api"
 	"github.com/gorilla/mux"
 	"log"
 	"net/http"
-	"time"
+	"flag"
+	"SimpleHttpServer/dbconn"
+	_ "github.com/lib/pq"
 )
 
 func main() {
-	fmt.Println("SpaceX golang starting")
-	time.Sleep(8 * time.Second) //wait for postgres
+	log.Println("SimpleHttpServer starting")
+	flag.Parse()
+	dbconn.WaitForDb()
 	api.CreateSpaceBnBDb()
 
 	//db := dbconn.NewDbConnection()
-	//defer db.Close()
+	//defer dbconn.CloseDb(db)
 	//var lastInsertId int
 	//err:= db.QueryRow("INSERT INTO booking(\"user\", title, description, expiration, " +
 	//	"location_x, location_y) " +
@@ -29,10 +31,4 @@ func main() {
 	r.HandleFunc("/api/listings", api.Listings)
 	r.HandleFunc("/api/listings/{id:[0-9]+}", api.SingleListing)
 	log.Fatal(http.ListenAndServe(":9090", r))
-}
-
-func checkErr(err error) {
-	if err != nil {
-		panic(err)
-	}
 }
