@@ -136,7 +136,6 @@ func getPaginationMinMax(page string, length string) (min int, max int, hasPagin
 	hasPagination = false
 	var err error
 	if page == "" || length == "" {
-		log.Println("Invalid page or length")
 		return
 	}
 	var pageNum int

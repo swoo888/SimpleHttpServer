@@ -8,8 +8,10 @@ services:
       - postgresdb
     stdin_open: true
     tty: true
+    environment:
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
   postgresdb:
     image: postgres
     restart: always
     environment:
-          POSTGRES_PASSWORD: BlueSky8@3
+          POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
