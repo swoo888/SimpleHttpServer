@@ -13,9 +13,20 @@ var dbName = flag.String("db", "", "postgres database")
 var dbUserName = flag.String("user", "", "postgres user")
 var dbPassword = flag.String("pass", "", "postgres password");
 
-// NewDbConnection will return a new postgres database connection.  it will try multiple tries
+var dbConn *sql.DB
+
+// GetMainDbConn returns the main db connection
+func GetMainDbConn() *sql.DB {
+	if dbConn == nil {
+		waitForDb()
+		dbConn = newDbConnection()
+	}
+	return dbConn
+}
+
+// newDbConnection will return a new postgres database connection.  it will try multiple tries
 // to obtain a db connection
-func NewDbConnection() (db *sql.DB) {
+func newDbConnection() (db *sql.DB) {
 	if *dbName == "" || *hostName == "" || *dbUserName == "" || *dbPassword == "" {
 		log.Println("postgres credentials not set")
 		flag.PrintDefaults()
@@ -43,13 +54,13 @@ func NewDbConnection() (db *sql.DB) {
 	}
 }
 
-// WaitForDb waits for database to be ready.  database launched from docker takes time to be ready
-func WaitForDb() {
-	const SuccessCnt int = 2
+// waitForDb waits for database to be ready.  database launched from docker takes time to be ready
+func waitForDb() {
+	const SuccessCnt = 2
 	successCntRemaining := SuccessCnt
 	failedCntRemaining := 5
 	for {
-		db := NewDbConnection()
+		db := newDbConnection()
 		if db != nil {
 			successCntRemaining--
 			if successCntRemaining <= 0 {
@@ -59,7 +70,7 @@ func WaitForDb() {
 		} else {
 			failedCntRemaining--
 			if failedCntRemaining <= 0 {
-				break
+				panic("database is not up")
 			}
 			successCntRemaining = SuccessCnt
 			time.Sleep(2 * time.Second)
@@ -67,9 +78,12 @@ func WaitForDb() {
 	}
 }
 
-// CloseDb closes database connection
-func CloseDb(db *sql.DB){
-	err := db.Close()
+// CloseMainDbConn closes the main database connection
+func CloseMainDbConn() {
+	if dbConn == nil {
+		return
+	}
+	err := dbConn.Close()
 	if err != nil {
 		log.Println("error closing db.", err)
 	}
