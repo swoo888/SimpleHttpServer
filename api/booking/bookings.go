@@ -98,6 +98,7 @@ func getPaginationMinMax(page string, length string) (min int, max int, hasPagin
 func bookingsDelete(resp http.ResponseWriter) {
 	res, err := booking.DeleteAll()
 	if err != nil {
+		http.Error(resp, err.Error(), http.StatusInternalServerError)
 		return
 	}
 	writeResultJSONResponse(resp, res)
